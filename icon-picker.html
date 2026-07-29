@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ThumbnailStudio · Icon Picker</title>
+    <!-- Iconify web component: renders any of ~300k icons from the Iconify API -->
+    <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js"></script>
+    <style>
+      :root {
+        --bg: #0f1420;
+        --panel: #171d2b;
+        --panel2: #1f2636;
+        --text: #e6e9ef;
+        --muted: #8b93a7;
+        --accent: #6366f1;
+        --ok: #22c55e;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font: 15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      }
+      header {
+        position: sticky;
+        top: 0;
+        background: linear-gradient(var(--bg), var(--bg) 70%, transparent);
+        padding: 20px 24px 12px;
+        z-index: 5;
+      }
+      h1 { margin: 0 0 4px; font-size: 20px; }
+      h1 small { color: var(--muted); font-weight: 400; font-size: 13px; }
+      .search {
+        display: flex;
+        gap: 10px;
+        margin-top: 12px;
+      }
+      input[type="search"] {
+        flex: 1;
+        background: var(--panel);
+        border: 1px solid #2b3448;
+        border-radius: 10px;
+        color: var(--text);
+        padding: 12px 14px;
+        font-size: 16px;
+        outline: none;
+      }
+      input[type="search"]:focus { border-color: var(--accent); }
+      .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+      .chip {
+        background: var(--panel2);
+        border: 1px solid #2b3448;
+        color: var(--muted);
+        border-radius: 999px;
+        padding: 5px 12px;
+        font-size: 13px;
+        cursor: pointer;
+      }
+      .chip:hover { color: var(--text); border-color: var(--accent); }
+      .note {
+        color: var(--muted);
+        font-size: 12.5px;
+        margin-top: 10px;
+      }
+      .note b { color: #c7cdda; font-weight: 600; }
+      main { padding: 8px 24px 60px; }
+      .status { color: var(--muted); padding: 24px 4px; }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+        gap: 10px;
+      }
+      .tile {
+        background: var(--panel);
+        border: 1px solid #232b3d;
+        border-radius: 12px;
+        padding: 14px 8px 10px;
+        text-align: center;
+        cursor: pointer;
+        transition: transform 0.06s, border-color 0.12s, background 0.12s;
+        overflow: hidden;
+      }
+      .tile:hover { border-color: var(--accent); background: var(--panel2); transform: translateY(-2px); }
+      .tile iconify-icon { font-size: 40px; color: #f2f4f8; }
+      .tile .name {
+        margin-top: 10px;
+        font-size: 11px;
+        color: var(--muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        direction: rtl; /* keep the icon name (right part) visible when truncated */
+        text-align: center;
+      }
+      .tile.bundled { border-color: #2f6b3f; }
+      .tile.bundled .badge { color: var(--ok); }
+      .badge { display: block; font-size: 9.5px; margin-top: 2px; letter-spacing: 0.3px; }
+      #toast {
+        position: fixed;
+        left: 50%;
+        bottom: 24px;
+        transform: translateX(-50%) translateY(20px);
+        background: var(--ok);
+        color: #05210f;
+        font-weight: 600;
+        padding: 10px 18px;
+        border-radius: 999px;
+        opacity: 0;
+        transition: opacity 0.2s, transform 0.2s;
+        pointer-events: none;
+      }
+      #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Icon Picker <small>· click an icon to copy its <code>set:name</code>, paste into the layer's <b>iconName</b></small></h1>
+      <div class="search">
+        <input id="q" type="search" placeholder="Search icons…  (e.g. fire, play, arrow, youtube)" autofocus />
+      </div>
+      <div class="chips" id="chips"></div>
+      <div class="note">
+        <b>Bundled sets</b> (green outline) — <b>lucide</b>, <b>mdi</b>, <b>simple-icons</b> — render offline &amp; instantly.
+        Other sets work too but need internet when you export. Needs internet to browse here.
+      </div>
+    </header>
+    <main>
+      <div class="status" id="status">Type to search ~300,000 icons, or tap a suggestion above.</div>
+      <div class="grid" id="grid"></div>
+    </main>
+    <div id="toast"></div>
+
+    <script>
+      const BUNDLED = new Set(["lucide", "mdi", "simple-icons"]);
+      const SUGGESTIONS = [
+        "fire", "play", "arrow-right", "star", "check", "heart", "bell",
+        "crown", "rocket", "trophy", "lightning", "warning", "youtube",
+        "instagram", "tiktok", "cart", "download", "clock", "sparkles",
+      ];
+      const q = document.getElementById("q");
+      const grid = document.getElementById("grid");
+      const status = document.getElementById("status");
+      const toastEl = document.getElementById("toast");
+
+      const chips = document.getElementById("chips");
+      SUGGESTIONS.forEach((s) => {
+        const c = document.createElement("button");
+        c.className = "chip";
+        c.textContent = s;
+        c.onclick = () => { q.value = s; search(s); };
+        chips.appendChild(c);
+      });
+
+      let toastTimer;
+      function toast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toastEl.classList.remove("show"), 1400);
+      }
+
+      async function copy(text) {
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch (e) {
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          ta.style.position = "fixed";
+          ta.style.opacity = "0";
+          document.body.appendChild(ta);
+          ta.select();
+          try { document.execCommand("copy"); } catch (_) {}
+          document.body.removeChild(ta);
+        }
+        toast("Copied  " + text);
+      }
+
+      function render(icons) {
+        grid.innerHTML = "";
+        icons.forEach((name) => {
+          const prefix = name.split(":")[0];
+          const bundled = BUNDLED.has(prefix);
+          const tile = document.createElement("div");
+          tile.className = "tile" + (bundled ? " bundled" : "");
+          tile.title = name;
+          tile.onclick = () => copy(name);
+          const ic = document.createElement("iconify-icon");
+          ic.setAttribute("icon", name);
+          tile.appendChild(ic);
+          const nm = document.createElement("div");
+          nm.className = "name";
+          nm.textContent = name;
+          tile.appendChild(nm);
+          if (bundled) {
+            const b = document.createElement("span");
+            b.className = "badge";
+            b.textContent = "offline";
+            tile.appendChild(b);
+          }
+          grid.appendChild(tile);
+        });
+      }
+
+      let seq = 0;
+      async function search(query) {
+        const term = query.trim();
+        if (!term) {
+          grid.innerHTML = "";
+          status.textContent = "Type to search ~300,000 icons, or tap a suggestion above.";
+          return;
+        }
+        const mine = ++seq;
+        status.textContent = "Searching “" + term + "” …";
+        try {
+          const res = await fetch(
+            "https://api.iconify.design/search?query=" +
+              encodeURIComponent(term) +
+              "&limit=120"
+          );
+          const data = await res.json();
+          if (mine !== seq) return; // a newer search superseded this one
+          const icons = data.icons || [];
+          if (!icons.length) {
+            status.textContent = "No icons found for “" + term + "”.";
+            grid.innerHTML = "";
+            return;
+          }
+          // Bundled sets first.
+          icons.sort((a, b) => {
+            const ab = BUNDLED.has(a.split(":")[0]) ? 0 : 1;
+            const bb = BUNDLED.has(b.split(":")[0]) ? 0 : 1;
+            return ab - bb;
+          });
+          status.textContent = icons.length + " results — click to copy the name.";
+          render(icons);
+        } catch (e) {
+          status.textContent = "Search failed (need internet). " + e;
+        }
+      }
+
+      let debounce;
+      q.addEventListener("input", () => {
+        clearTimeout(debounce);
+        debounce = setTimeout(() => search(q.value), 250);
+      });
+    </script>
+  </body>
+</html>
