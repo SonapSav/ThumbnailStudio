@@ -1,0 +1,15 @@
+# Normalize all text files to LF in the repo; check out with LF everywhere.
+# Keeps diffs clean across Windows and Debian/Linux.
+* text=auto eol=lf
+
+# Binary assets — never touch line endings.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
