@@ -1,49 +1,69 @@
 # ThumbnailStudio
 
-A props-driven thumbnail designer for **YouTube** and **Instagram**, built on
-[Remotion](https://www.remotion.dev). Every thumbnail is a React component
-controlled entirely by props — colors, opacity, dimensions, angles, x/y
-position, scale, rotation — edited live in the Remotion Studio panel and
-exported to PNG / JPEG / WebP.
+**Design YouTube & Instagram thumbnails as code.** A props-driven thumbnail
+designer built on [Remotion](https://www.remotion.dev): every thumbnail is a
+React component you edit live in a visual panel — no design app, no manual
+pixel-pushing — and export to PNG / JPEG / WebP at exact platform sizes.
 
-## Formats
+![A thumbnail generated with ThumbnailStudio](assets/example-modernblue.png)
 
-| Composition            | Aspect | Size        | Use                     |
-| ---------------------- | ------ | ----------- | ----------------------- |
-| `Thumbnail-Landscape`  | 16:9   | 1280 × 720  | YouTube thumbnail       |
-| `Thumbnail-Portrait`   | 9:16   | 1080 × 1920 | Reels / Stories cover   |
-| `Thumbnail-Square`     | 1:1    | 1080 × 1080 | Instagram feed post     |
+## Highlights
 
-All three share one component (`src/Thumbnail.tsx`) and one schema
-(`src/schema/thumbnail.ts`); they differ only in dimensions and starting props.
+- 🎨 **Edit visually, ship consistently** — tune every layer (color, position,
+  scale, rotation, opacity, effects) in Remotion Studio's auto-generated props
+  panel. Live preview, no custom UI to learn.
+- 📐 **Three native formats** — 16:9 (YouTube), 9:16 (Reels/Stories), 1:1 (feed),
+  all driven by one component and schema.
+- 🧱 **Rich layer types** — text, images, shapes, lines, icons, and QR codes,
+  freely stacked by z-index.
+- ✨ **Built-in effects** — gradients, shadows, glow, blur, duotone, sticker
+  outlines, frosted glass, film grain, curved text, and inline text highlights.
+- 🔤 **14 bundled fonts** and **~300k [Iconify](https://iconify.design) icons**
+  (common sets render fully offline), plus emoji.
+- 🖼️ **Reproducible exports** — render from the CLI, script batch outputs, or
+  feed a saved props JSON. What you preview is exactly what renders.
 
-## Setup
+## Examples
 
-Runs on **Windows, macOS, and Linux**.
+Both images below are defined entirely by props and rendered by Remotion — change
+the props, get a new thumbnail.
 
-### Prerequisites
+| YouTube 16:9 (`Thumbnail-Landscape`) | "Modern" template |
+| --- | --- |
+| ![](assets/example-landscape.png) | ![](assets/example-modernblue.png) |
 
-- **Node.js 20+** — this repo pins **22** in `.nvmrc`; with [nvm](https://github.com/nvm-sh/nvm),
-  run `nvm install` inside the project to match it.
-- **Git**.
+## Quick start
 
-### Install
+Requires **[Node.js](https://nodejs.org) 20+** (this repo pins **22** via
+`.nvmrc`) and **[Git](https://git-scm.com)**.
 
 ```bash
 git clone git@github.com:SonapSav/ThumbnailStudio.git
 cd ThumbnailStudio
 npm install
+npm run studio
 ```
 
-`npm install` pulls the Remotion binaries built for *your* OS, so install on the
-machine you'll run it on rather than copying `node_modules` between machines.
+Studio opens at **http://localhost:3013**. Pick a composition in the left
+sidebar, then edit its props in the right panel — color pickers, sliders, text
+areas, and add/remove buttons for each layer. Changes preview instantly.
 
-### Linux only — headless-Chrome libraries
+> **On Linux?** Rendering needs a few headless-Chrome system libraries — see
+> [Platform setup](#platform-setup). macOS and Windows work with just the steps
+> above.
 
-Remotion renders through headless Chrome, which needs a few shared libraries that
-aren't present on a bare Linux install. **macOS and Windows need nothing extra.**
+## Platform setup
 
-Debian / Ubuntu:
+Runs on **Windows, macOS, and Linux**.
+
+### Windows / macOS
+
+Nothing extra — Node + `npm install` is all you need.
+
+### Linux
+
+Remotion renders through headless Chrome, which needs shared libraries not
+present on a bare install. Debian / Ubuntu:
 
 ```bash
 sudo apt update
@@ -55,26 +75,18 @@ sudo apt install -y libnss3 libdbus-1-3 libatk1.0-0 libgbm-dev libasound2 \
 > Newer Ubuntu (22.04 / 24.04) uses `libasound2t64` in place of `libasound2`.
 > Full list: [Remotion Linux dependencies](https://www.remotion.dev/docs/miscellaneous/linux-dependencies).
 
-### Run
+## Formats
 
-```bash
-npm run studio
-```
+| Composition            | Aspect | Size        | Use                     |
+| ---------------------- | ------ | ----------- | ----------------------- |
+| `Thumbnail-Landscape`  | 16:9   | 1280 × 720  | YouTube thumbnail       |
+| `Thumbnail-Portrait`   | 9:16   | 1080 × 1920 | Reels / Stories cover   |
+| `Thumbnail-Square`     | 1:1    | 1080 × 1080 | Instagram feed post     |
 
-Studio opens at **http://localhost:3013**. Pick a composition in the left
-sidebar, then edit its props in the right panel — color pickers, sliders, text
-areas, and add/remove buttons for each layer array. Changes preview instantly.
-
-### Contributing
-
-Commit authorship is standardized by a tracked git hook. `core.hooksPath` is
-local config, so activate it once after cloning:
-
-```bash
-git config core.hooksPath .githooks
-```
-
-It appends the project's co-author trailer to every commit automatically.
+All three share one component (`src/Thumbnail.tsx`) and one schema
+(`src/schema/thumbnail.ts`); they differ only in dimensions and starting props.
+Two ready-made template compositions (`Thumbnail-Landscape-Top10`,
+`Thumbnail-Landscape-ModernBlue`) show fuller designs to start from.
 
 ## The layer model
 
@@ -104,7 +116,7 @@ turn it **off before exporting**.
   valley); curved mode is plain text (no box/highlights).
 - **images** — from `public/` (by filename), a URL, or a data URI; fit +
   radius, shadow, glow, **`blur`**, and **duotone** (`duotoneShadow` /
-  `duotoneHighlight` — a stylized 2-tone photo grade)
+  `duotoneHighlight` — a stylized 2-tone photo grade).
   Images & icons also support a **sticker outline** (`outlineColor` /
   `outlineWidth` — a solid border hugging the alpha).
 - **lines** — a straight line, two `mode`s: **vector** (from the `transform`
@@ -190,7 +202,7 @@ Add a font by importing its `loadFont` in `src/fonts.ts` and adding it to the
 ```
 src/
   index.ts            registerRoot
-  Root.tsx            the three <Composition> registrations + inline defaultProps
+  Root.tsx            the five <Composition> registrations + inline defaultProps
   Thumbnail.tsx       composites all layers by zIndex; background, overlay, grid
   formats.ts          dimensions per aspect ratio
   fonts.ts            Google font loading + fontFamily enum source
@@ -199,6 +211,25 @@ src/
   layers/             LayerFrame + Text / Image / Shape / Icon / Qr / Line / CurvedText
                       components and fill / shadow / duotone / outline helpers
 public/               image assets
+assets/               README example renders
 icon-picker.html      standalone Iconify browser (search + copy icon names)
 .githooks/            prepare-commit-msg hook (co-author trailer)
 ```
+
+## Contributing
+
+Commit authorship is standardized by a tracked git hook. `core.hooksPath` is
+local config, so activate it once after cloning:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+It appends the project's co-author trailer to every commit automatically.
+
+## License / usage
+
+Built on Remotion, which is **free for individuals and small teams** but requires
+a company license above a size/revenue threshold — see the
+[Remotion license](https://www.remotion.dev/docs/license). Make sure your use
+qualifies before relying on it commercially.
