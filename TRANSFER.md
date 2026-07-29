@@ -74,7 +74,16 @@ npm install
 This pulls the Linux-native binaries (`@remotion/compositor-linux-x64-gnu`, etc.)
 in place of the Windows ones.
 
-### d) (Optional) Pre-fetch the render browser
+### d) Enable the commit hook
+
+The co-author commit hook lives in the tracked `.githooks/` dir. `core.hooksPath`
+is local config, so activate it once per machine (after a fresh clone):
+
+```bash
+git config core.hooksPath .githooks
+```
+
+### e) (Optional) Pre-fetch the render browser
 
 ```bash
 npx remotion browser ensure

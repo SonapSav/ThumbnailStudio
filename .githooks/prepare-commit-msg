@@ -1,0 +1,34 @@
+#!/bin/sh
+#
+# prepare-commit-msg — enforce the project's co-author trailer on every commit.
+#
+# Automatically appends
+#     Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+# to every commit message (regardless of who authors it), idempotently.
+#
+# Enabled via a tracked hooks dir so it travels with the repo:
+#     git config core.hooksPath .githooks
+# (Re-run that one command after a fresh clone to activate.)
+
+msg_file="$1"
+source="$2"
+trailer="Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
+
+# Leave merge/squash auto-generated messages alone.
+case "$source" in
+  merge|squash) exit 0 ;;
+esac
+
+# Skip if the message has no real content yet (only blank lines / comments) —
+# don't turn an about-to-be-aborted empty commit into a non-empty one.
+if ! grep -qvE '^[[:space:]]*(#.*)?$' "$msg_file"; then
+  exit 0
+fi
+
+# Idempotent: never add a second copy (match the trailer case-insensitively).
+if grep -qiF "$trailer" "$msg_file"; then
+  exit 0
+fi
+
+# Append as a proper git trailer (handles blank-line separation for us).
+git interpret-trailers --trailer "$trailer" --in-place "$msg_file"
