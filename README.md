@@ -4,7 +4,7 @@ A props-driven thumbnail designer for **YouTube** and **Instagram**, built on
 [Remotion](https://www.remotion.dev). Every thumbnail is a React component
 controlled entirely by props — colors, opacity, dimensions, angles, x/y
 position, scale, rotation — edited live in the Remotion Studio panel and
-exported to PNG.
+exported to PNG / JPEG / WebP.
 
 ## Formats
 
@@ -17,24 +17,69 @@ exported to PNG.
 All three share one component (`src/Thumbnail.tsx`) and one schema
 (`src/schema/thumbnail.ts`); they differ only in dimensions and starting props.
 
-## Getting started
+## Setup
+
+Runs on **Windows, macOS, and Linux**.
+
+### Prerequisites
+
+- **Node.js 20+** — this repo pins **22** in `.nvmrc`; with [nvm](https://github.com/nvm-sh/nvm),
+  run `nvm install` inside the project to match it.
+- **Git**.
+
+### Install
 
 ```bash
+git clone git@github.com:SonapSav/ThumbnailStudio.git
+cd ThumbnailStudio
 npm install
+```
+
+`npm install` pulls the Remotion binaries built for *your* OS, so install on the
+machine you'll run it on rather than copying `node_modules` between machines.
+
+### Linux only — headless-Chrome libraries
+
+Remotion renders through headless Chrome, which needs a few shared libraries that
+aren't present on a bare Linux install. **macOS and Windows need nothing extra.**
+
+Debian / Ubuntu:
+
+```bash
+sudo apt update
+sudo apt install -y libnss3 libdbus-1-3 libatk1.0-0 libgbm-dev libasound2 \
+  libxrandr2 libxkbcommon-dev libxfixes3 libxcomposite1 libxdamage1 \
+  libpango-1.0-0 libcairo2 libcups2 libatk-bridge2.0-0
+```
+
+> Newer Ubuntu (22.04 / 24.04) uses `libasound2t64` in place of `libasound2`.
+> Full list: [Remotion Linux dependencies](https://www.remotion.dev/docs/miscellaneous/linux-dependencies).
+
+### Run
+
+```bash
 npm run studio
 ```
 
-Moving the project to another machine (e.g. Debian/Linux)? See
-[`TRANSFER.md`](TRANSFER.md) — don't copy `node_modules`, reinstall it there.
+Studio opens at **http://localhost:3013**. Pick a composition in the left
+sidebar, then edit its props in the right panel — color pickers, sliders, text
+areas, and add/remove buttons for each layer array. Changes preview instantly.
 
-Studio opens at http://localhost:3013. Pick a composition in the left sidebar,
-then edit its props in the right panel — color pickers, sliders, text areas, and
-add/remove buttons for each layer array. Changes preview instantly.
+### Contributing
+
+Commit authorship is standardized by a tracked git hook. `core.hooksPath` is
+local config, so activate it once after cloning:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+It appends the project's co-author trailer to every commit automatically.
 
 ## The layer model
 
-A thumbnail is a **canvas background** plus three **layer arrays**. Add as many
-of each as you like; every layer shares the same transform controls.
+A thumbnail is a **canvas background** plus a set of typed **layer arrays**. Add
+as many of each as you like; every layer shares the same transform controls.
 
 The background (`backgroundType`) is a full-frame fill: **solid** color,
 **linear** or **radial** gradient, or an **image** (`backgroundImageSrc` +
@@ -98,7 +143,7 @@ Every layer has a `transform`:
 | `opacity`  | 0 → 1                                             |
 | `zIndex`   | Global stacking order across all layers (higher = front) |
 
-Layers from all four arrays are composited into a single stack ordered by
+Layers from every array are composited into a single stack ordered by
 `zIndex`, so a shape can sit behind or in front of any text or image.
 
 > Layers are kept in **per-type arrays** rather than one mixed list because
@@ -145,12 +190,15 @@ Add a font by importing its `loadFont` in `src/fonts.ts` and adding it to the
 ```
 src/
   index.ts            registerRoot
-  Root.tsx            the three <Composition> registrations
-  Thumbnail.tsx       composites all layers by zIndex
+  Root.tsx            the three <Composition> registrations + inline defaultProps
+  Thumbnail.tsx       composites all layers by zIndex; background, overlay, grid
   formats.ts          dimensions per aspect ratio
   fonts.ts            Google font loading + fontFamily enum source
+  icons.ts            bundled Iconify sets (lucide / mdi / simple-icons / twemoji)
   schema/             zod schemas (transform, layers, thumbnail props)
-  layers/             LayerFrame + Text/Image/Shape/Gradient components
-  defaults/           per-format sample props
+  layers/             LayerFrame + Text / Image / Shape / Icon / Qr / Line / CurvedText
+                      components and fill / shadow / duotone / outline helpers
 public/               image assets
+icon-picker.html      standalone Iconify browser (search + copy icon names)
+.githooks/            prepare-commit-msg hook (co-author trailer)
 ```
