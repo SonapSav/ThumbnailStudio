@@ -38,7 +38,11 @@ Requires **[Node.js](https://nodejs.org) 20+** (this repo pins **22** via
 `.nvmrc`) and **[Git](https://git-scm.com)**.
 
 ```bash
+# Clone over SSH …
 git clone git@github.com:SonapSav/ThumbnailStudio.git
+# … or over HTTPS
+git clone https://github.com/SonapSav/ThumbnailStudio.git
+
 cd ThumbnailStudio
 npm install
 npm run studio
