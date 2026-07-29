@@ -2,6 +2,8 @@
   "name": "thumbnailstudio",
   "version": "0.1.0",
   "description": "Props-driven thumbnail designer for YouTube & Instagram (16:9, 9:16, 1:1) built on Remotion",
+  "author": "Panos Vasilopoulos",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "studio": "remotion studio --port 3013",

@@ -5,6 +5,17 @@ designer built on [Remotion](https://www.remotion.dev): every thumbnail is a
 React component you edit live in a visual panel — no design app, no manual
 pixel-pushing — and export to PNG / JPEG / WebP at exact platform sizes.
 
+## About
+
+ThumbnailStudio turns thumbnail design into a repeatable, prop-driven workflow.
+Instead of dragging boxes in an image editor, you compose typed layers — text,
+images, shapes, lines, icons, QR codes — and tune every attribute (color,
+position, scale, rotation, opacity, effects) from Remotion Studio's
+auto-generated panel, with a live preview. One design definition renders to the
+three native sizes for **YouTube** (16:9), **Reels/Stories** (9:16), and
+**Instagram feed** (1:1), and exports deterministically from the CLI — so the
+same props always produce the same pixels.
+
 <!-- Placeholder — replace assets/screenshot-studio.png with a real Remotion Studio screenshot (16:9 recommended). -->
 ![Remotion Studio — editing a thumbnail live](assets/screenshot-studio.png)
 
@@ -231,9 +242,15 @@ git config core.hooksPath .githooks
 
 It appends the project's co-author trailer to every commit automatically.
 
-## License / usage
+## License
 
-Built on Remotion, which is **free for individuals and small teams** but requires
-a company license above a size/revenue threshold — see the
-[Remotion license](https://www.remotion.dev/docs/license). Make sure your use
-qualifies before relying on it commercially.
+ThumbnailStudio's own source code is licensed **MIT © 2026 Panos Vasilopoulos** —
+see [`LICENSE`](LICENSE).
+
+> **Remotion is not MIT.** This project is built on
+> [Remotion](https://www.remotion.dev), which is distributed under the
+> [Remotion License](https://github.com/remotion-dev/remotion/blob/main/LICENSE.md):
+> free for individuals and small teams, but a **paid company license** is
+> required above a team-size / revenue threshold. The MIT license here covers
+> only this repository's code — it grants no rights to Remotion. Make sure your
+> use of Remotion qualifies before relying on it, especially commercially.
