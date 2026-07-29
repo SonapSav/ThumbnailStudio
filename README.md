@@ -5,7 +5,8 @@ designer built on [Remotion](https://www.remotion.dev): every thumbnail is a
 React component you edit live in a visual panel — no design app, no manual
 pixel-pushing — and export to PNG / JPEG / WebP at exact platform sizes.
 
-![A thumbnail generated with ThumbnailStudio](assets/example-modernblue.png)
+<!-- Placeholder — replace assets/screenshot-studio.png with a real Remotion Studio screenshot (16:9 recommended). -->
+![Remotion Studio — editing a thumbnail live](assets/screenshot-studio.png)
 
 ## Highlights
 
@@ -23,14 +24,13 @@ pixel-pushing — and export to PNG / JPEG / WebP at exact platform sizes.
 - 🖼️ **Reproducible exports** — render from the CLI, script batch outputs, or
   feed a saved props JSON. What you preview is exactly what renders.
 
-## Examples
+## Screenshots
 
-Both images below are defined entirely by props and rendered by Remotion — change
-the props, get a new thumbnail.
+<!-- Placeholders — replace the images under assets/ with real screenshots. -->
 
-| YouTube 16:9 (`Thumbnail-Landscape`) | "Modern" template |
+| Editing props in the Studio panel | Live preview |
 | --- | --- |
-| ![](assets/example-landscape.png) | ![](assets/example-modernblue.png) |
+| ![Editing props panel](assets/screenshot-editing.png) | ![Live preview](assets/screenshot-preview.png) |
 
 ## Quick start
 
@@ -211,7 +211,7 @@ src/
   layers/             LayerFrame + Text / Image / Shape / Icon / Qr / Line / CurvedText
                       components and fill / shadow / duotone / outline helpers
 public/               image assets
-assets/               README example renders
+assets/               README screenshots
 icon-picker.html      standalone Iconify browser (search + copy icon names)
 .githooks/            prepare-commit-msg hook (co-author trailer)
 ```
